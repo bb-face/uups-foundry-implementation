@@ -106,35 +106,42 @@ contract CollateralManagerTest is Test {
     }
 
     function test__FullLoanRepayment() public {
-        // uint256 depositAmount = 2 ether;
-        // uint256 borrowAmount = 1 ether;
-        // vm.deal(addr1, depositAmount);
-        // vm.startPrank(addr1);
-        // collateralManager.depositCollateral{value: depositAmount}();
-        // collateralManager.borrowDeFiCoins(borrowAmount);
-        // vm.stopPrank();
-        // console.log("-- here");
-        // console.log(collateralManager.getLoanBalance(addr1));
-        // vm.warp(block.timestamp + 365 days);
-        // uint256 expectedRepayment = collateralManager.loanBalances(addr1) +
-        //     collateralManager.calculateInterest(addr1);
-        // // Expect transferFrom on the mock
-        // // vm.expectCall(
-        // //     address(defiCoin),
-        // //     abi.encodeWithSelector(
-        // //         defiCoin.safeTransferFrom.selector,
-        // //         addr1,
-        // //         address(collateralManager),
-        // //         expectedRepayment
-        // //     )
-        // // );
-        // defiCoin.approve(addr1, expectedRepayment);
-        // vm.deal(addr1, expectedRepayment);
-        // vm.prank(addr1);
-        // collateralManager.repayLoan(expectedRepayment);
-        // // Assertions
-        // assertEq(collateralManager.loanBalances(addr1), 0);
-        // assertEq(collateralManager.loanTimestamps(addr1), 0);
+        uint256 depositAmount = 2 ether;
+        uint256 borrowAmount = 1 ether;
+
+        vm.deal(addr1, depositAmount);
+        vm.startPrank(addr1);
+        collateralManager.depositCollateral{value: depositAmount}();
+        collateralManager.borrowDeFiCoins(borrowAmount);
+        vm.stopPrank();
+
+        // console.log("defiCoin balance of addr1:", defiCoin.balanceOf(addr1));
+        // 1_000_000_000_000_000_000;
+
+        vm.warp(block.timestamp + 365 days);
+
+        uint256 expectedRepayment = collateralManager.loanBalances(addr1) +
+            collateralManager.calculateInterest(addr1);
+
+        vm.prank(addr1);
+        defiCoin.approve(address(collateralManager), expectedRepayment);
+
+        vm.expectCall(
+            address(defiCoin),
+            abi.encodeWithSelector(
+                defiCoin.transferFrom.selector,
+                addr1,
+                address(collateralManager),
+                expectedRepayment
+            )
+        );
+
+        vm.deal(addr1, expectedRepayment);
+        vm.prank(addr1);
+        collateralManager.repayLoan(expectedRepayment);
+
+        assertEq(collateralManager.loanBalances(addr1), 0);
+        assertEq(collateralManager.loanTimestamps(addr1), 0);
     }
 
     function test__PartialLoanRepayment() public {

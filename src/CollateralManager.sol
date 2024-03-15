@@ -88,7 +88,7 @@ contract CollateralManager is ReentrancyGuard {
         uint256 loanDurationInYears = loanDurationInSeconds /
             (365 * 24 * 60 * 60);
         uint256 interest = (loanBalances[user] *
-            ANNUAL_INTEREST_RATE *
+            (ANNUAL_INTEREST_RATE / 100) *
             loanDurationInYears) / 100;
 
         return interest;
