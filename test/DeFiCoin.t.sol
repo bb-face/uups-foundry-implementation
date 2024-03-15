@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.20;
 
 import "forge-std/Test.sol";
+
 import "../src/DeFiCoin.sol";
 
 contract DeFiCoinTest is Test {
@@ -121,7 +122,7 @@ contract DeFiCoinTest is Test {
         assertFalse(defiCoin.whitelistedAddresses(addr1));
     }
 
-    function testWhitelistedCanBuyInPrivateSale() public {
+    function test__WhitelistedCanBuyInPrivateSale() public {
         vm.prank(owner);
         defiCoin.addToWhiteList(addr1);
 
@@ -195,7 +196,7 @@ contract DeFiCoinTest is Test {
     //     defiCoin.buyTokens{value: PUBLIC_SALE_PRICE}();
     // }
 
-    function testBuyTokensExceedingMaxAllocationInPrivateSale() public {
+    function test__BuyTokensExceedingMaxAllocationInPrivateSale() public {
         vm.prank(owner);
         defiCoin.addToWhiteList(addr1);
 
