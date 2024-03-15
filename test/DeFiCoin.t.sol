@@ -17,15 +17,19 @@ contract DeFiCoinTest is Test {
     }
 
     function test__AddToWhitelist() public {
-        // vm.prank(owner);
-        // defiCoin.addToWhiteList(addr1);
-        // assertEq(defiCoin.whitelistedAddresses(addr1), true);
-        // assertEq(1, 1);
+        vm.prank(owner);
+        defiCoin.addToWhiteList(addr1);
+
+        assertEq(defiCoin.whitelistedAddresses(addr1), true);
     }
 
-    //function test__RemoveFromWhitelist() public {
-    //    defiCoin.addToWhiteList(addr1);
-    //    defiCoin.removeFromWhitelist(addr1);
-    //    assertFalse(defiCoin.whitelistedAddresses(addr1));
-    //}
+    function test__RemoveFromWhitelist() public {
+        vm.prank(owner);
+        defiCoin.addToWhiteList(addr1);
+
+        vm.prank(owner);
+        defiCoin.removeFromWhitelist(addr1);
+
+        assertFalse(defiCoin.whitelistedAddresses(addr1));
+    }
 }
