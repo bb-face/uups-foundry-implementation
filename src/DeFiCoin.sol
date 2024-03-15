@@ -25,14 +25,16 @@ contract DeFiCoin is ERC20, Ownable {
     mapping(address => bool) public whitelistedAddresses;
     mapping(address => bool) public canMint;
 
-    constructor() Ownable(msg.sender) ERC20("DeFiCoin", "DFC") {}
+    constructor() Ownable(msg.sender) ERC20("DeFiCoin", "DFC") {
+        addToMintList(owner());
+    }
 
     function mint(address to, uint256 amount) public {
         if (!canMint[msg.sender]) revert DeFiCoin__cantMint();
         _mint(to, amount);
     }
 
-    function addToMintList(address _address) external onlyOwner {
+    function addToMintList(address _address) public onlyOwner {
         canMint[_address] = true;
     }
 

@@ -26,22 +26,22 @@ contract DeFiCoinTest is Test {
 
     function test__OwnerCanBurn() public {}
 
-    // function test__OwnerCanMint() public {
-    //     uint256 amountToMint = 1000;
-    //     uint256 initialTotalSupply = defiCoin.totalSupply();
+    function test__OwnerCanMint() public {
+        uint256 amountToMint = 1000;
+        uint256 initialTotalSupply = defiCoin.totalSupply();
 
-    //     vm.prank(owner);
-    //     defiCoin.mint(addr1, amountToMint);
+        vm.prank(owner);
+        defiCoin.mint(addr1, amountToMint);
 
-    //     uint256 newTotalSupply = defiCoin.totalSupply();
-    //     uint256 expectedTotalSupply = initialTotalSupply + amountToMint;
+        uint256 newTotalSupply = defiCoin.totalSupply();
+        uint256 expectedTotalSupply = initialTotalSupply + amountToMint;
 
-    //     assertEq(
-    //         newTotalSupply,
-    //         expectedTotalSupply,
-    //         "Failed to mint the correct amount of tokens"
-    //     );
-    // }
+        assertEq(
+            newTotalSupply,
+            expectedTotalSupply,
+            "Failed to mint the correct amount of tokens"
+        );
+    }
 
     function test__NonOwnerCannotMint() public {
         vm.prank(addr1);
