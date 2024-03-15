@@ -20,6 +20,7 @@ contract CollateralManager is Ownable {
 
     mapping(address => uint256) public collateralBalances;
     mapping(address => uint256) public loanBalances;
+
     mapping(address => uint256) public loanAmounts;
     mapping(address => uint256) public loanTimestamps;
 
@@ -35,8 +36,7 @@ contract CollateralManager is Ownable {
     }
 
     function calculateBorrowLimit(address user) public view returns (uint256) {
-        uint256 depositedEth = collateralBalances[user];
-        return (depositedEth * COLLATERALIZATION_RATIO) / 100; // 100 -> %
+        return (collateralBalances[user] * COLLATERALIZATION_RATIO) / 100; // 100 -> %
     }
 
     function withdrawCollateral(uint256 amount) public {
