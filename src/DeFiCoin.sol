@@ -6,10 +6,13 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 error DeFiCoin__wrongSaleStage();
 error DeFiCoin__notEnoughEth();
+error DeFiCoin__notWhitelisted();
+error DeFiCoin__maxTokenAllocationExceeded();
 
 contract DeFiCoin is ERC20, Ownable {
-    uint256 public privateSalePrice = 0.0001 ether;
-    uint256 public publicSalePrice = 0.0002 ether;
+    uint256 public constant PRIVATE_SALE_PRICE = 0.0001 ether;
+    uint256 public constant MAX_TOKEN_ALLOCATION = 1000;
+    uint256 public constant PUBLIC_SALE_PRICE = 0.0002 ether;
 
     enum SaleStage {
         PrivateSale,
@@ -18,6 +21,7 @@ contract DeFiCoin is ERC20, Ownable {
     }
 
     SaleStage public currentSaleStage = SaleStage.PrivateSale;
+    mapping(address => bool) public whitelistedAddresses;
 
     constructor() Ownable(msg.sender) ERC20("DeFiCoin", "DFC") {}
 
@@ -45,6 +49,14 @@ contract DeFiCoin is ERC20, Ownable {
         currentSaleStage = SaleStage.SaleEnded;
     }
 
+    function addToWhiteList(address _address) external onlyOwner {
+        whitelistedAddresses[_address] = true;
+    }
+
+    function removeFromWhitelist(address _address) public onlyOwner {
+        whitelistedAddresses[_address] = false;
+    }
+
     function buyTokens() public payable {
         if (currentSaleStage == SaleStage.SaleEnded)
             revert DeFiCoin__wrongSaleStage();
@@ -52,9 +64,15 @@ contract DeFiCoin is ERC20, Ownable {
         uint256 tokensToMint = 0;
 
         if (currentSaleStage == SaleStage.PrivateSale) {
-            tokensToMint = msg.value / privateSalePrice;
+            if (!whitelistedAddresses[msg.sender])
+                revert DeFiCoin__notWhitelisted();
+
+            tokensToMint = msg.value / PRIVATE_SALE_PRICE;
+
+            if (tokensToMint > MAX_TOKEN_ALLOCATION)
+                revert DeFiCoin__maxTokenAllocationExceeded();
         } else if (currentSaleStage == SaleStage.PublicSale) {
-            tokensToMint = msg.value / publicSalePrice;
+            tokensToMint = msg.value / PUBLIC_SALE_PRICE;
         }
 
         if (tokensToMint == 0) revert DeFiCoin__notEnoughEth();
