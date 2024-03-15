@@ -19,14 +19,14 @@ error CollateralManager__RepaymentNotSufficient();
 interface IDeFiCoin {
     function mint(address to, uint256 amount) external;
 
-    function safeTransferFrom(address from, address to, uint amount) external;
+    function transferFrom(address from, address to, uint amount) external;
 }
 
 contract CollateralManager is ReentrancyGuard {
     IDeFiCoin public defiCoin;
 
     uint256 public constant COLLATERALIZATION_RATIO = 150;
-    uint256 private constant ANNUAL_INTEREST_RATE = 10; //%
+    uint256 public constant ANNUAL_INTEREST_RATE = 10; //%
 
     mapping(address => uint256) public collateralBalances;
     mapping(address => uint256) public loanBalances;
@@ -34,6 +34,10 @@ contract CollateralManager is ReentrancyGuard {
 
     constructor(address _defiCoinAddress) {
         defiCoin = IDeFiCoin(_defiCoinAddress);
+    }
+
+    function getLoanBalance(address _address) external view returns (uint) {
+        return loanBalances[_address];
     }
 
     function depositCollateral() public payable {
@@ -100,7 +104,7 @@ contract CollateralManager is ReentrancyGuard {
             revert CollateralManager__RepayAmountExceedsTotalOwed();
         }
 
-        defiCoin.safeTransferFrom(msg.sender, address(this), amount);
+        defiCoin.transferFrom(msg.sender, address(this), amount);
 
         loanBalances[msg.sender] = 0;
         loanTimestamps[msg.sender] = 0;
