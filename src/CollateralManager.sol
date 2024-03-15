@@ -13,7 +13,6 @@ error CollateralManager__notEnoughLoanBalance();
 error CollateralManager__amountCantBeZero();
 error CollateralManager__transferFailed();
 error CollateralManager__borrowingAmountExceeded();
-error CollateralManager__amountTooLow();
 error CollateralManager__RepayAmountExceedsTotalOwed();
 error CollateralManager__RepaymentNotSufficient();
 
