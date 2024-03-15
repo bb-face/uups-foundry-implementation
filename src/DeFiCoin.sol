@@ -33,8 +33,6 @@ contract DeFiCoin is ERC20, Ownable {
         _burn(from, amount);
     }
 
-    // function transfer(address recipient, uint256 amount) public virtual override returns (bool);
-
     function startPublicSale() external onlyOwner {
         if (currentSaleStage != SaleStage.PrivateSale)
             revert DeFiCoin__wrongSaleStage();
