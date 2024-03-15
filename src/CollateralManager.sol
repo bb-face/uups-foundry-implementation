@@ -16,9 +16,14 @@ error CollateralManager__borrowingAmountExceeded();
 error CollateralManager__RepayAmountExceedsTotalOwed();
 error CollateralManager__RepaymentNotSufficient();
 
+interface IDeFiCoin {
+    function mint(address to, uint256 amount) external;
+
+    function safeTransferFrom(address from, address to, uint amount) external;
+}
+
 contract CollateralManager is ReentrancyGuard {
-    using SafeERC20 for IERC20;
-    IERC20 public defiCoin;
+    IDeFiCoin public defiCoin;
 
     uint256 public constant COLLATERALIZATION_RATIO = 150;
     uint256 private constant ANNUAL_INTEREST_RATE = 10; //%
@@ -28,7 +33,7 @@ contract CollateralManager is ReentrancyGuard {
     mapping(address => uint256) public loanTimestamps;
 
     constructor(address _defiCoinAddress) {
-        defiCoin = IERC20(_defiCoinAddress);
+        defiCoin = IDeFiCoin(_defiCoinAddress);
     }
 
     function depositCollateral() public payable {
@@ -69,9 +74,7 @@ contract CollateralManager is ReentrancyGuard {
         loanBalances[msg.sender] += amount;
         loanTimestamps[msg.sender] = block.timestamp;
 
-        bool sent = defiCoin.transfer(msg.sender, amount);
-
-        if (!sent) revert CollateralManager__transferFailed();
+        defiCoin.mint(msg.sender, amount);
     }
 
     function calculateInterest(address user) public view returns (uint256) {

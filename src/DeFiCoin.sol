@@ -8,6 +8,7 @@ error DeFiCoin__wrongSaleStage();
 error DeFiCoin__notEnoughEth();
 error DeFiCoin__notWhitelisted();
 error DeFiCoin__maxTokenAllocationExceeded();
+error DeFiCoin__cantMint();
 
 contract DeFiCoin is ERC20, Ownable {
     uint256 public constant PRIVATE_SALE_PRICE = 0.0001 ether;
@@ -22,11 +23,17 @@ contract DeFiCoin is ERC20, Ownable {
 
     SaleStage public currentSaleStage = SaleStage.PrivateSale;
     mapping(address => bool) public whitelistedAddresses;
+    mapping(address => bool) public canMint;
 
     constructor() Ownable(msg.sender) ERC20("DeFiCoin", "DFC") {}
 
-    function mint(address to, uint256 amount) public onlyOwner {
+    function mint(address to, uint256 amount) public {
+        if (!canMint[msg.sender]) revert DeFiCoin__cantMint();
         _mint(to, amount);
+    }
+
+    function addToMintList(address _address) external onlyOwner {
+        canMint[_address] = true;
     }
 
     function burn(address from, uint256 amount) public onlyOwner {
