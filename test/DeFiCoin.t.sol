@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.4;
 
 import "forge-std/Test.sol";
 import "../src/DeFiCoin.sol";
@@ -148,7 +148,7 @@ contract DeFiCoinTest is Test {
             uint(DeFiCoin.SaleStage.PrivateSale)
         );
 
-        uint256 sentValue = PRIVATE_SALE_PRICE * 10; // Attempt to buy 10 tokens
+        uint256 sentValue = PRIVATE_SALE_PRICE * 10;
 
         vm.prank(addr1);
         vm.deal(addr1, sentValue);
@@ -165,11 +165,11 @@ contract DeFiCoinTest is Test {
             uint(DeFiCoin.SaleStage.PublicSale)
         );
 
-        uint256 sentValue = PUBLIC_SALE_PRICE * 100; // Attempt to buy 100 tokens
-        uint256 expectedTokens = (sentValue / PUBLIC_SALE_PRICE) * 10 ** 18; // Calculate expected token amount
+        uint256 sentValue = PUBLIC_SALE_PRICE * 100;
+        uint256 expectedTokens = (sentValue / PUBLIC_SALE_PRICE) * 10 ** 18;
 
         vm.prank(addr1);
-        vm.deal(addr1, sentValue); // Provide ETH to buyer
+        vm.deal(addr1, sentValue);
         defiCoin.buyTokens{value: sentValue}();
 
         assertEq(
@@ -204,6 +204,18 @@ contract DeFiCoinTest is Test {
         vm.prank(addr1);
         vm.deal(addr1, sentValue);
         vm.expectRevert(DeFiCoin__maxTokenAllocationExceeded.selector);
+        defiCoin.buyTokens{value: sentValue}();
+    }
+
+    function test__BuyTokensWithoutEnoughETH() public {
+        vm.prank(owner);
+        defiCoin.startPublicSale();
+
+        uint256 sentValue = 1;
+
+        vm.prank(addr1);
+        vm.deal(addr1, sentValue);
+        vm.expectRevert(DeFiCoin__notEnoughEth.selector);
         defiCoin.buyTokens{value: sentValue}();
     }
 }
