@@ -153,7 +153,7 @@ contract DeFiCoinTest is Test {
 
         vm.prank(addr1);
         vm.deal(addr1, sentValue);
-        vm.expectRevert(DeFiCoin__notWhitelisted.selector);
+        vm.expectRevert(DeFiCoin__NotWhitelisted.selector);
         defiCoin.buyTokens{value: sentValue}();
     }
 
@@ -191,7 +191,7 @@ contract DeFiCoinTest is Test {
             uint(DeFiCoin.SaleStage.SaleEnded)
         );
 
-        vm.expectRevert(DeFiCoin__wrongSaleStage.selector);
+        vm.expectRevert(DeFiCoin__WrongSaleStage.selector);
         vm.deal(addr1, 1 ether);
         vm.prank(addr1);
         defiCoin.buyTokens{value: 1}();
@@ -205,7 +205,7 @@ contract DeFiCoinTest is Test {
 
         vm.prank(addr1);
         vm.deal(addr1, sentValue);
-        vm.expectRevert(DeFiCoin__maxTokenAllocationExceeded.selector);
+        vm.expectRevert(DeFiCoin__MaxTokenAllocationExceeded.selector);
         defiCoin.buyTokens{value: sentValue}();
     }
 
@@ -217,7 +217,7 @@ contract DeFiCoinTest is Test {
 
         vm.prank(addr1);
         vm.deal(addr1, sentValue);
-        vm.expectRevert(DeFiCoin__notEnoughEth.selector);
+        vm.expectRevert(DeFiCoin__NotEnoughEth.selector);
         defiCoin.buyTokens{value: sentValue}();
     }
 }
