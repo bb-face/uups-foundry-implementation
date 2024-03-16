@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 import "forge-std/Test.sol";
 
-import "../src/CollateralManager.sol"; // Update path to your contract
+import "../src/CollateralManager.sol";
 import "../src/DeFiCoin.sol";
 
 contract CollateralManagerTest is Test {
@@ -197,14 +197,13 @@ contract CollateralManagerTest is Test {
         collateralManager.borrowDeFiCoins(borrowAmount);
         vm.stopPrank();
 
-        // uint256 maxAllowedWithdrawal = (collateralManager.calculateBorrowLimit(
-        //     addr1
-        // ) - collateralManager.loanBalances(addr1));
-        // uint256 invalidWithdrawalAmount = maxAllowedWithdrawal + 1;
+        uint256 maxAllowedWithdrawal = (collateralManager.calculateBorrowLimit(
+            addr1
+        ) - collateralManager.loanBalances(addr1));
+        uint256 invalidWithdrawalAmount = maxAllowedWithdrawal - 1;
 
         vm.expectRevert(CollateralManager__notEnoughLoanBalance.selector);
         vm.prank(addr1);
-        // collateralManager.withdrawCollateral(invalidWithdrawalAmount);
-        collateralManager.withdrawCollateral(depositAmount);
+        collateralManager.withdrawCollateral(invalidWithdrawalAmount);
     }
 }
