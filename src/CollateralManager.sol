@@ -38,12 +38,12 @@ contract CollateralManager is
     mapping(address => uint256) public loanTimestamps;
 
     function initialize(
-        address _defiCoinAddress,
-        address _owner
+        address defiCoinAddress,
+        address owner
     ) public initializer {
-        OwnableUpgradeable.__Ownable_init(_owner);
+        OwnableUpgradeable.__Ownable_init(owner);
         version = 1;
-        defiCoin = IDeFiCoin(_defiCoinAddress);
+        defiCoin = IDeFiCoin(defiCoinAddress);
     }
 
     function getVersion() public view returns (uint) {
@@ -54,8 +54,8 @@ contract CollateralManager is
         address newImplementation
     ) internal virtual override onlyOwner {}
 
-    function getLoanBalance(address _address) external view returns (uint) {
-        return loanBalances[_address];
+    function getLoanBalance(address addr) external view returns (uint) {
+        return loanBalances[addr];
     }
 
     function depositCollateral() public payable {
