@@ -180,21 +180,22 @@ contract DeFiCoinTest is Test {
         );
     }
 
-    // function test__CannotBuyTokensAfterSaleEnded() public {
-    //     vm.startPrank(owner);
-    //     defiCoin.startPublicSale();
-    //     defiCoin.endSale();
-    //     vm.stopPrank();
+    function test__CannotBuyTokensAfterSaleEnded() public {
+        vm.startPrank(owner);
+        defiCoin.startPublicSale();
+        defiCoin.endSale();
+        vm.stopPrank();
 
-    //     assertEq(
-    //         uint(defiCoin.currentSaleStage()),
-    //         uint(DeFiCoin.SaleStage.SaleEnded)
-    //     );
+        assertEq(
+            uint(defiCoin.currentSaleStage()),
+            uint(DeFiCoin.SaleStage.SaleEnded)
+        );
 
-    //     vm.prank(addr1);
-    //     vm.expectRevert(DeFiCoin__wrongSaleStage.selector);
-    //     defiCoin.buyTokens{value: PUBLIC_SALE_PRICE}();
-    // }
+        vm.expectRevert(DeFiCoin__wrongSaleStage.selector);
+        vm.deal(addr1, 1 ether);
+        vm.prank(addr1);
+        defiCoin.buyTokens{value: 1}();
+    }
 
     function test__BuyTokensExceedingMaxAllocationInPrivateSale() public {
         vm.prank(owner);

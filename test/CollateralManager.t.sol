@@ -76,7 +76,7 @@ contract CollateralManagerTest is Test {
 
     function test__BorrowingWithinLimit() public {
         uint256 depositAmount = 2 ether;
-        uint256 borrowAmount = 1 ether; // Within limit (assuming COLLATERALIZATION_RATIO = 150)
+        uint256 borrowAmount = 1 ether;
 
         vm.deal(addr1, depositAmount);
         vm.prank(addr1);
@@ -114,9 +114,6 @@ contract CollateralManagerTest is Test {
         collateralManager.depositCollateral{value: depositAmount}();
         collateralManager.borrowDeFiCoins(borrowAmount);
         vm.stopPrank();
-
-        // console.log("defiCoin balance of addr1:", defiCoin.balanceOf(addr1));
-        // 1_000_000_000_000_000_000;
 
         vm.warp(block.timestamp + 365 days);
 
