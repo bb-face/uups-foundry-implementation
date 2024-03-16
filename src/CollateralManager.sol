@@ -37,10 +37,6 @@ contract CollateralManager is
     mapping(address => uint256) public loanBalances;
     mapping(address => uint256) public loanTimestamps;
 
-    // constructor(address _defiCoinAddress) {
-    //     defiCoin = IDeFiCoin(_defiCoinAddress);
-    // }
-
     function initialize(
         address _defiCoinAddress,
         address _owner
