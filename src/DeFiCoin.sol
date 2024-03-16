@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: SEE LICENSE IN LICENSE
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -34,8 +34,8 @@ contract DeFiCoin is ERC20, Ownable {
         _mint(to, amount);
     }
 
-    function addToMintList(address _address) public onlyOwner {
-        canMint[_address] = true;
+    function addToMintList(address addr) public onlyOwner {
+        canMint[addr] = true;
     }
 
     function burn(address from, uint256 amount) public onlyOwner {
@@ -56,12 +56,12 @@ contract DeFiCoin is ERC20, Ownable {
         currentSaleStage = SaleStage.SaleEnded;
     }
 
-    function addToWhiteList(address _address) external onlyOwner {
-        whitelistedAddresses[_address] = true;
+    function addToWhiteList(address addr) external onlyOwner {
+        whitelistedAddresses[addr] = true;
     }
 
-    function removeFromWhitelist(address _address) public onlyOwner {
-        whitelistedAddresses[_address] = false;
+    function removeFromWhiteList(address addr) public onlyOwner {
+        whitelistedAddresses[addr] = false;
     }
 
     function buyTokens() public payable {

@@ -17,11 +17,11 @@ contract CollateralManagerTest is Test {
         vm.prank(owner);
         defiCoin = new DeFiCoin();
 
-        vm.prank(owner);
-        collateralManager = new CollateralManager(address(defiCoin));
-
-        vm.prank(owner);
+        vm.startPrank(owner);
+        collateralManager = new CollateralManager();
+        collateralManager.initialize(address(defiCoin), owner);
         defiCoin.addToMintList(address(collateralManager));
+        vm.stopPrank();
     }
 
     function test__SuccessfulDeposit() public {
