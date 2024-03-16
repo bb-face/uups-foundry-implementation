@@ -36,7 +36,7 @@ contract CollateralManagerTest is Test {
 
     function test__ZeroAmountDeposit() public {
         vm.prank(addr1);
-        vm.expectRevert(CollateralManager__notEnoughEth.selector);
+        vm.expectRevert(CollateralManager__NotEnoughEth.selector);
         collateralManager.depositCollateral{value: 0}();
     }
 
@@ -69,7 +69,7 @@ contract CollateralManagerTest is Test {
         vm.prank(addr1);
         collateralManager.depositCollateral{value: depositAmount}();
 
-        vm.expectRevert(CollateralManager__notEnoughCollateral.selector);
+        vm.expectRevert(CollateralManager__NotEnoughCollateral.selector);
         vm.prank(addr1);
         collateralManager.withdrawCollateral(withdrawalAmount);
     }
@@ -100,7 +100,7 @@ contract CollateralManagerTest is Test {
         vm.deal(addr1, depositAmount);
         collateralManager.depositCollateral{value: depositAmount}();
 
-        vm.expectRevert(CollateralManager__borrowingAmountExceeded.selector);
+        vm.expectRevert(CollateralManager__BorrowingAmountExceeded.selector);
         vm.prank(addr1);
         collateralManager.borrowDeFiCoins(borrowAmount);
     }
@@ -199,7 +199,7 @@ contract CollateralManagerTest is Test {
         ) - collateralManager.loanBalances(addr1));
         uint256 invalidWithdrawalAmount = maxAllowedWithdrawal - 1;
 
-        vm.expectRevert(CollateralManager__notEnoughLoanBalance.selector);
+        vm.expectRevert(CollateralManager__NotEnoughLoanBalance.selector);
         vm.prank(addr1);
         collateralManager.withdrawCollateral(invalidWithdrawalAmount);
     }
