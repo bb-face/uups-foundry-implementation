@@ -117,7 +117,7 @@ contract DeFiCoinTest is Test {
         assertTrue(defiCoin.whitelistedAddresses(addr1));
 
         vm.prank(owner);
-        defiCoin.removeFromWhitelist(addr1);
+        defiCoin.removeFromWhiteList(addr1);
 
         assertFalse(defiCoin.whitelistedAddresses(addr1));
     }
