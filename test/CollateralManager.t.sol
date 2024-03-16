@@ -18,7 +18,7 @@ contract CollateralManagerTest is Test {
         defiCoin = new DeFiCoin();
 
         vm.prank(owner);
-        collateralManager = new CollateralManager(address(defiCoin));
+        collateralManager = new CollateralManager();
 
         vm.prank(owner);
         defiCoin.addToMintList(address(collateralManager));

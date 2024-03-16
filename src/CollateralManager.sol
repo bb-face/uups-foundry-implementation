@@ -2,8 +2,8 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {UUPSUpgradeable} from "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
+import {OwnableUpgradeable} from "@openzeppelin-upgradeable/contracts/access/OwnableUpgradeable.sol";
 
 import "./DeFiCoin.sol";
 
@@ -22,19 +22,37 @@ interface IDeFiCoin {
     function transferFrom(address from, address to, uint amount) external;
 }
 
-contract CollateralManager is ReentrancyGuard {
+contract CollateralManager is
+    ReentrancyGuard,
+    OwnableUpgradeable,
+    UUPSUpgradeable
+{
     IDeFiCoin public defiCoin;
 
     uint256 public constant COLLATERALIZATION_RATIO = 150;
     uint256 public constant ANNUAL_INTEREST_RATE = 10; //%
+    uint256 public version;
 
     mapping(address => uint256) public collateralBalances;
     mapping(address => uint256) public loanBalances;
     mapping(address => uint256) public loanTimestamps;
 
-    constructor(address _defiCoinAddress) {
+    // constructor(address _defiCoinAddress) {
+    //     defiCoin = IDeFiCoin(_defiCoinAddress);
+    // }
+
+    function initialize(
+        address _defiCoinAddress,
+        address _owner
+    ) public initializer {
+        OwnableUpgradeable.__Ownable_init(_owner);
+        version = 1;
         defiCoin = IDeFiCoin(_defiCoinAddress);
     }
+
+    function _authorizeUpgrade(
+        address newImplementation
+    ) internal virtual override onlyOwner {}
 
     function getLoanBalance(address _address) external view returns (uint) {
         return loanBalances[_address];

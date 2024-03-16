@@ -1,0 +1,1 @@
+source .env && forge script --target-contract DeployCollateralManager --rpc-url ${RPC_URL} --broadcast -vvvv script/DeployCollateralManager.s.sol
