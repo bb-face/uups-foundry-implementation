@@ -50,6 +50,10 @@ contract CollateralManager is
         defiCoin = IDeFiCoin(_defiCoinAddress);
     }
 
+    function getVersion() public view returns (uint) {
+        return version;
+    }
+
     function _authorizeUpgrade(
         address newImplementation
     ) internal virtual override onlyOwner {}

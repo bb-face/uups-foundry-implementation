@@ -7,8 +7,4 @@ contract CollateralManagerV2 is CollateralManager {
     function upgradeVersion() public {
         version = 2;
     }
-
-    function getVersion() public view returns (uint) {
-        return version;
-    }
 }
