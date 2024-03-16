@@ -9,8 +9,10 @@ error DeFiCoin__NotEnoughEth();
 error DeFiCoin__NotWhitelisted();
 error DeFiCoin__MaxTokenAllocationExceeded();
 error DeFiCoin__CantMint();
+error DeFiCoin__MaxSupplyReached();
 
 contract DeFiCoin is ERC20, Ownable {
+    uint256 public constant MAX_SUPPLY = 1000000 * (10 ** 18);
     uint256 public constant PRIVATE_SALE_PRICE = 0.0001 ether;
     uint256 public constant MAX_TOKEN_ALLOCATION = 1000;
     uint256 public constant PUBLIC_SALE_PRICE = 0.0002 ether;
@@ -30,7 +32,11 @@ contract DeFiCoin is ERC20, Ownable {
     }
 
     function mint(address to, uint256 amount) public {
+        if (totalSupply() + amount > MAX_SUPPLY)
+            revert DeFiCoin__MaxSupplyReached();
+
         if (!canMint[msg.sender]) revert DeFiCoin__CantMint();
+
         _mint(to, amount);
     }
 
