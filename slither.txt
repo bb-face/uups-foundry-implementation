@@ -1,0 +1,114 @@
+❯ slither .
+'forge clean' running (wd: /Users/stefano/Workspace/Work/growity-coding-test)
+'forge config --json' running
+'forge build --build-info --skip */test/** */script/** --force' running (wd: /Users/stefano/Workspace/Work/growity-coding-test)
+INFO:Detectors:
+CollateralManagerV2 (src/CollateralManagerV2.sol#6-10) is an upgradeable contract that does not protect its initialize functions: CollateralManager.initialize(address,address) (src/CollateralManager.sol#45-52). Anyone can delete the contract with: UUPSUpgradeable.upgradeToAndCall(address,bytes) (lib/openzeppelin-contracts/contracts/proxy/utils/UUPSUpgradeable.sol#86-89)Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unprotected-upgradeable-contract
+INFO:Detectors:
+CollateralManager.calculateInterest(address) (src/CollateralManager.sol#107-116) performs a multiplication on the result of a division:
+        - loanDurationInYears = loanDurationInSeconds / (365 * 24 * 60 * 60) (src/CollateralManager.sol#109-110)
+        - interest = (loanBalances[user] * (ANNUAL_INTEREST_RATE / 100) * loanDurationInYears) / 100 (src/CollateralManager.sol#111-113)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+INFO:Detectors:
+Reentrancy in CollateralManager.repayLoan(uint256) (src/CollateralManager.sol#118-134):
+        External calls:
+        - s = defiCoin.transferFrom(msg.sender,address(this),amount) (src/CollateralManager.sol#128)
+        State variables written after the call(s):
+        - loanBalances[msg.sender] = 0 (src/CollateralManager.sol#132)
+        CollateralManager.loanBalances (src/CollateralManager.sol#42) can be used in cross function reentrancies:
+        - CollateralManager.calculateInterest(address) (src/CollateralManager.sol#107-116)
+        - CollateralManager.getLoanBalance(address) (src/CollateralManager.sol#62-64)
+        - CollateralManager.loanBalances (src/CollateralManager.sol#42)
+        - loanTimestamps[msg.sender] = 0 (src/CollateralManager.sol#133)
+        CollateralManager.loanTimestamps (src/CollateralManager.sol#43) can be used in cross function reentrancies:
+        - CollateralManager.calculateInterest(address) (src/CollateralManager.sol#107-116)
+        - CollateralManager.loanTimestamps (src/CollateralManager.sol#43)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+INFO:Detectors:
+ERC1967Utils.upgradeToAndCall(address,bytes) (lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Utils.sol#83-92) ignores return value by Address.functionDelegateCall(newImplementation,data) (lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Utils.sol#88)
+ERC1967Utils.upgradeBeaconToAndCall(address,bytes) (lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Utils.sol#173-182) ignores return value by Address.functionDelegateCall(IBeacon(newBeacon).implementation(),data) (lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Utils.sol#178)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+INFO:Detectors:
+CollateralManager.initialize(address,address).owner (src/CollateralManager.sol#47) shadows:
+        - OwnableUpgradeable.owner() (lib/openzeppelin-contracts-upgradeable/contracts/access/OwnableUpgradeable.sol#73-76) (function)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+INFO:Detectors:
+CollateralManager.repayLoan(uint256) (src/CollateralManager.sol#118-134) uses timestamp for comparisons
+        Dangerous comparisons:
+        - amount < totalOwed (src/CollateralManager.sol#122)
+        - amount > totalOwed (src/CollateralManager.sol#124)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+INFO:Detectors:
+OwnableUpgradeable._getOwnableStorage() (lib/openzeppelin-contracts-upgradeable/contracts/access/OwnableUpgradeable.sol#30-34) uses assembly
+        - INLINE ASM (lib/openzeppelin-contracts-upgradeable/contracts/access/OwnableUpgradeable.sol#31-33)
+Initializable._getInitializableStorage() (lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/Initializable.sol#223-227) uses assembly
+        - INLINE ASM (lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/Initializable.sol#224-226)
+Address._revert(bytes) (lib/openzeppelin-contracts/contracts/utils/Address.sol#146-158) uses assembly
+        - INLINE ASM (lib/openzeppelin-contracts/contracts/utils/Address.sol#151-154)
+StorageSlot.getAddressSlot(bytes32) (lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol#59-64) uses assembly
+        - INLINE ASM (lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol#61-63)
+StorageSlot.getBooleanSlot(bytes32) (lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol#69-74) uses assembly
+        - INLINE ASM (lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol#71-73)
+StorageSlot.getBytes32Slot(bytes32) (lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol#79-84) uses assembly
+        - INLINE ASM (lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol#81-83)
+StorageSlot.getUint256Slot(bytes32) (lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol#89-94) uses assembly
+        - INLINE ASM (lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol#91-93)
+StorageSlot.getStringSlot(bytes32) (lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol#99-104) uses assembly
+        - INLINE ASM (lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol#101-103)
+StorageSlot.getStringSlot(string) (lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol#109-114) uses assembly
+        - INLINE ASM (lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol#111-113)
+StorageSlot.getBytesSlot(bytes32) (lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol#119-124) uses assembly
+        - INLINE ASM (lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol#121-123)
+StorageSlot.getBytesSlot(bytes) (lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol#129-134) uses assembly
+        - INLINE ASM (lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol#131-133)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+INFO:Detectors:
+Pragma version^0.8.20 (lib/openzeppelin-contracts-upgradeable/contracts/access/OwnableUpgradeable.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.8.18.
+Pragma version^0.8.20 (lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/Initializable.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.8.18.
+Pragma version^0.8.20 (lib/openzeppelin-contracts-upgradeable/contracts/utils/ContextUpgradeable.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.8.18.
+Pragma version^0.8.20 (lib/openzeppelin-contracts/contracts/access/Ownable.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.8.18.
+Pragma version^0.8.20 (lib/openzeppelin-contracts/contracts/interfaces/draft-IERC1822.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.8.18.
+Pragma version^0.8.20 (lib/openzeppelin-contracts/contracts/interfaces/draft-IERC6093.sol#3) necessitates a version too recent to be trusted. Consider deploying with 0.8.18.
+Pragma version^0.8.20 (lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Utils.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.8.18.
+Pragma version^0.8.20 (lib/openzeppelin-contracts/contracts/proxy/beacon/IBeacon.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.8.18.
+Pragma version^0.8.20 (lib/openzeppelin-contracts/contracts/proxy/utils/UUPSUpgradeable.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.8.18.
+Pragma version^0.8.20 (lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.8.18.
+Pragma version^0.8.20 (lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.8.18.
+Pragma version^0.8.20 (lib/openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.8.18.
+Pragma version^0.8.20 (lib/openzeppelin-contracts/contracts/utils/Address.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.8.18.
+Pragma version^0.8.20 (lib/openzeppelin-contracts/contracts/utils/Context.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.8.18.
+Pragma version^0.8.20 (lib/openzeppelin-contracts/contracts/utils/ReentrancyGuard.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.8.18.
+Pragma version^0.8.20 (lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol#5) necessitates a version too recent to be trusted. Consider deploying with 0.8.18.
+Pragma version^0.8.20 (src/CollateralManager.sol#2) necessitates a version too recent to be trusted. Consider deploying with 0.8.18.
+Pragma version^0.8.20 (src/CollateralManagerV2.sol#2) necessitates a version too recent to be trusted. Consider deploying with 0.8.18.
+Pragma version^0.8.20 (src/DeFiCoin.sol#2) necessitates a version too recent to be trusted. Consider deploying with 0.8.18.
+solc-0.8.20 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+INFO:Detectors:
+Low level call in Address.sendValue(address,uint256) (lib/openzeppelin-contracts/contracts/utils/Address.sol#41-50):
+        - (success) = recipient.call{value: amount}() (lib/openzeppelin-contracts/contracts/utils/Address.sol#46)
+Low level call in Address.functionCallWithValue(address,bytes,uint256) (lib/openzeppelin-contracts/contracts/utils/Address.sol#83-89):
+        - (success,returndata) = target.call{value: value}(data) (lib/openzeppelin-contracts/contracts/utils/Address.sol#87)
+Low level call in Address.functionStaticCall(address,bytes) (lib/openzeppelin-contracts/contracts/utils/Address.sol#95-98):
+        - (success,returndata) = target.staticcall(data) (lib/openzeppelin-contracts/contracts/utils/Address.sol#96)
+Low level call in Address.functionDelegateCall(address,bytes) (lib/openzeppelin-contracts/contracts/utils/Address.sol#104-107):
+        - (success,returndata) = target.delegatecall(data) (lib/openzeppelin-contracts/contracts/utils/Address.sol#105)
+Low level call in CollateralManager.withdrawCollateral(uint256) (src/CollateralManager.sol#71-89):
+        - (sent) = msg.sender.call{value: amount}() (src/CollateralManager.sol#86)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+INFO:Detectors:
+DeFiCoin (src/DeFiCoin.sol#14-99) should inherit from IDeFiCoin (src/CollateralManager.sol#19-27)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-inheritance
+INFO:Detectors:
+Function OwnableUpgradeable.__Ownable_init(address) (lib/openzeppelin-contracts-upgradeable/contracts/access/OwnableUpgradeable.sol#51-53) is not in mixedCase
+Function OwnableUpgradeable.__Ownable_init_unchained(address) (lib/openzeppelin-contracts-upgradeable/contracts/access/OwnableUpgradeable.sol#55-60) is not in mixedCase
+Constant OwnableUpgradeable.OwnableStorageLocation (lib/openzeppelin-contracts-upgradeable/contracts/access/OwnableUpgradeable.sol#28) is not in UPPER_CASE_WITH_UNDERSCORES
+Function ContextUpgradeable.__Context_init() (lib/openzeppelin-contracts-upgradeable/contracts/utils/ContextUpgradeable.sol#18-19) is not in mixedCase
+Function ContextUpgradeable.__Context_init_unchained() (lib/openzeppelin-contracts-upgradeable/contracts/utils/ContextUpgradeable.sol#21-22) is not in mixedCase
+Variable UUPSUpgradeable.__self (lib/openzeppelin-contracts/contracts/proxy/utils/UUPSUpgradeable.sol#21) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+INFO:Detectors:
+DeFiCoin.slitherConstructorConstantVariables() (src/DeFiCoin.sol#14-99) uses literals with too many digits:
+        - MAX_SUPPLY = 1000000 * (10 ** 18) (src/DeFiCoin.sol#15)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+INFO:Slither:. analyzed (22 contracts with 93 detectors), 51 result(s) found
