@@ -7,19 +7,23 @@ import {OwnableUpgradeable} from "@openzeppelin-upgradeable/contracts/access/Own
 
 import "./DeFiCoin.sol";
 
-error CollateralManager__notEnoughEth();
-error CollateralManager__notEnoughCollateral();
-error CollateralManager__notEnoughLoanBalance();
-error CollateralManager__amountCantBeZero();
-error CollateralManager__transferFailed();
-error CollateralManager__borrowingAmountExceeded();
+error CollateralManager__NotEnoughEth();
+error CollateralManager__NotEnoughCollateral();
+error CollateralManager__NotEnoughLoanBalance();
+error CollateralManager__AmountCantBeZero();
+error CollateralManager__TransferFailed();
+error CollateralManager__BorrowingAmountExceeded();
 error CollateralManager__RepayAmountExceedsTotalOwed();
 error CollateralManager__RepaymentNotSufficient();
 
 interface IDeFiCoin {
     function mint(address to, uint256 amount) external;
 
-    function transferFrom(address from, address to, uint amount) external;
+    function transferFrom(
+        address from,
+        address to,
+        uint amount
+    ) external returns (bool);
 }
 
 contract CollateralManager is
@@ -32,6 +36,7 @@ contract CollateralManager is
     uint256 public constant COLLATERALIZATION_RATIO = 150;
     uint256 public constant ANNUAL_INTEREST_RATE = 10; //%
     uint256 public version;
+    bool private initialized = false;
 
     mapping(address => uint256) public collateralBalances;
     mapping(address => uint256) public loanBalances;
@@ -59,14 +64,14 @@ contract CollateralManager is
     }
 
     function depositCollateral() public payable {
-        if (msg.value == 0) revert CollateralManager__notEnoughEth();
+        if (msg.value == 0) revert CollateralManager__NotEnoughEth();
         collateralBalances[msg.sender] += msg.value;
     }
 
     function withdrawCollateral(uint256 amount) public nonReentrant {
-        if (amount == 0) revert CollateralManager__amountCantBeZero();
+        if (amount == 0) revert CollateralManager__AmountCantBeZero();
         if (collateralBalances[msg.sender] < amount)
-            revert CollateralManager__notEnoughCollateral();
+            revert CollateralManager__NotEnoughCollateral();
 
         uint256 newCollateralBalance = collateralBalances[msg.sender] - amount;
 
@@ -74,13 +79,13 @@ contract CollateralManager is
             COLLATERALIZATION_RATIO) / 100;
 
         if (loanBalances[msg.sender] > maxLoanAllowedAfterWithdrawal)
-            revert CollateralManager__notEnoughLoanBalance();
+            revert CollateralManager__NotEnoughLoanBalance();
 
         collateralBalances[msg.sender] = newCollateralBalance;
 
         (bool sent, ) = msg.sender.call{value: amount}("");
 
-        if (!sent) revert CollateralManager__transferFailed();
+        if (!sent) revert CollateralManager__TransferFailed();
     }
 
     function calculateBorrowLimit(address user) public view returns (uint256) {
@@ -91,7 +96,7 @@ contract CollateralManager is
         uint256 borrowingLimit = calculateBorrowLimit(msg.sender);
 
         if (amount > borrowingLimit)
-            revert CollateralManager__borrowingAmountExceeded();
+            revert CollateralManager__BorrowingAmountExceeded();
 
         loanBalances[msg.sender] += amount;
         loanTimestamps[msg.sender] = block.timestamp;
@@ -100,8 +105,6 @@ contract CollateralManager is
     }
 
     function calculateInterest(address user) public view returns (uint256) {
-        if (loanTimestamps[user] == 0) return 0;
-
         uint256 loanDurationInSeconds = block.timestamp - loanTimestamps[user];
         uint256 loanDurationInYears = loanDurationInSeconds /
             (365 * 24 * 60 * 60);
@@ -122,7 +125,9 @@ contract CollateralManager is
             revert CollateralManager__RepayAmountExceedsTotalOwed();
         }
 
-        defiCoin.transferFrom(msg.sender, address(this), amount);
+        bool s = defiCoin.transferFrom(msg.sender, address(this), amount);
+
+        if (!s) revert CollateralManager__TransferFailed();
 
         loanBalances[msg.sender] = 0;
         loanTimestamps[msg.sender] = 0;
